@@ -15,23 +15,27 @@ function startGame(numberOfNodes) {
     nodeHandler = new NodeHandler(numberOfNodes)
     input.style.display = "none"
     button.style.display = "none"
+
     setTimeout(() => {
-
-        for (let node of nodeHandler.nodes) {
-            node.setPos()
-        }
-        for (let i = 0; i < numberOfNodes; i++) {
-            setTimeout(() => {
-                console.log("another change")
-                for (let node of nodeHandler.nodes) {
-                    node.setRandomPos()
-                }
-            }, 1000);
-        }
-
-
         nodeHandler.hideNumbers()
+        nodeHandler.setPoses()
+
+        setTimeout(() => {
+            startUpdatingPoses(numberOfNodes);  // Call the updatePoses function 5 times with 2 seconds interval
+        }, 1000);
     }, numberOfNodes * 1000);
+}
+
+function startUpdatingPoses(maxCount) {
+    let count = 0;
+    const intervalId = setInterval(() => {
+        nodeHandler.updatePoses();
+        count++;
+
+        if (count >= maxCount) {
+            clearInterval(intervalId);  // Stop the interval after maxCount updates
+        }
+    }, 2000);  // 2 seconds delay between updates
 }
 
 // created by gpt
@@ -91,18 +95,16 @@ class Node {
         this.domElement.innerHTML = `${this.ordered_number}`
     }
     getRandomPosInWindow() {
-        let elementHeight = this.domElement.offsetHeight
-        let elementWidth = this.domElement.offsetWidth
+        let elementHeight = this.domElement.offsetHeight;
+        let elementWidth = this.domElement.offsetWidth;
 
-        let x = Math.floor(Math.random() * window.innerWidth);
-        let y = Math.floor(Math.random() * window.innerHeight);
+        // Calculate valid ranges for x and y to avoid out-of-bounds
+        let x = Math.floor(Math.random() * (window.innerWidth - elementWidth));
+        let y = Math.floor(Math.random() * (window.innerHeight - elementHeight));
 
-        while (this.x < 0 || this.y < 0 || this.x > window.innerWidth - elementWidth || this.y > window.innerHeight - elementHeight) {
-            x = Math.floor(Math.random() * window.innerWidth);
-            y = Math.floor(Math.random() * window.innerHeight);
-        }
-        return [x, y]
+        return [x, y];
     }
+
     setRandomPos() {
         let [x, y] = this.getRandomPosInWindow();
         this.x = x
@@ -145,9 +147,14 @@ class NodeHandler {
             button.style.display = "inline"
         }
     }
-    updatePositions() {
+    setPoses() {
         for (let node of this.nodes) {
             node.setPos()
+        }
+    }
+    updatePoses() {
+        for (let node of this.nodes) {
+            node.setRandomPos();
         }
     }
     showNumbers() {
