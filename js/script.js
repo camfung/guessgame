@@ -9,6 +9,9 @@ function getRandomColor() {
 }
 
 function startGame(numberOfNodes) {
+    if (numberOfNodes > 7) {
+        alert(strings.gt7)
+    }
     if (nodeHandler) {
         nodeHandler.removeElements()
     }
@@ -19,9 +22,7 @@ function startGame(numberOfNodes) {
     setTimeout(() => {
         nodeHandler.hideNumbers()
 
-        setTimeout(() => {
-            startUpdatingPoses(numberOfNodes);
-        }, 1000);
+        startUpdatingPoses(numberOfNodes);
     }, numberOfNodes * 1000);
 }
 
@@ -67,7 +68,6 @@ class Node {
         let [x, y] = this.getRandomPosInWindow()
         this.x = x
         this.y = y
-        console.log("🚀 ~ Node ~ constructor ~ x:", x)
         this.domElement.addEventListener("click", () => {
             this.nodeHandler.nodeClicked(this.ordered_number)
         })
@@ -181,7 +181,6 @@ button.textContent = strings.go;
 
 // Append elements to the div with id 'menu'
 const menuDiv = document.getElementById('menu');
-console.log("🚀 ~ menuDiv:", menuDiv)
 
 menuDiv.appendChild(input);
 menuDiv.appendChild(button);
