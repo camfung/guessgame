@@ -11,6 +11,7 @@ function getRandomColor() {
 function startGame(numberOfNodes) {
     if (numberOfNodes > 7) {
         alert(strings.gt7)
+        return
     }
     if (nodeHandler) {
         nodeHandler.removeElements()
@@ -24,6 +25,7 @@ function startGame(numberOfNodes) {
 
         startUpdatingPoses(numberOfNodes);
     }, numberOfNodes * 1000);
+    nodeHandler.gameStarted = true
 }
 
 function startUpdatingPoses(maxCount) {
@@ -137,6 +139,9 @@ class NodeHandler {
                 button.style.display = "inline"
                 this.gameStarted = false
             }
+        }
+        else if (!this.gameStarted) {
+            return
         }
         else {
             this.showNumbers()
