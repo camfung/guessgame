@@ -18,10 +18,9 @@ function startGame(numberOfNodes) {
 
     setTimeout(() => {
         nodeHandler.hideNumbers()
-        nodeHandler.setPoses()
 
         setTimeout(() => {
-            startUpdatingPoses(numberOfNodes);  // Call the updatePoses function 5 times with 2 seconds interval
+            startUpdatingPoses(numberOfNodes);
         }, 1000);
     }, numberOfNodes * 1000);
 }
