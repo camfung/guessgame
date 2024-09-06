@@ -1,0 +1,27 @@
+need a media query for mobile
+make buttons display vertically 
+
+use current window size to keep them in the window
+
+hide the numbers 
+
+if user clicks in the correct order then display exelent memory! 
+
+pressing go releases all memory and restarts the game 
+
+i need to create an array that has an object with the following attributes: 
+1. image
+2. ordered_number
+3. position  !! this might be a different class well see 
+
+
+change the positions for each object 
+
+there should be a place_nodes method that takes the array and puts each element in the correct posistion in the window
+
+need to be able to move between the start screen and the 
+
+the events for the game will be 
+start game
+element clicked
+end game
