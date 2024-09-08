@@ -1,5 +1,5 @@
 strings = {
-    typeSomethingHere: "Type something here",
+    typeSomethingHere: "How many buttons to create?",
     go: "Go",
     excelentMemory: "Excelent Memory",
     wrongOrder: "Wrong Order", 
