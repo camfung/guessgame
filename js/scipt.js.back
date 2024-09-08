@@ -1,7 +1,14 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+let nodeHandler;
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }
-async function startGame(numberOfNodes) {
+
+function startGame(numberOfNodes) {
     if (numberOfNodes > 7) {
         alert(strings.gt7)
         return
@@ -10,26 +17,54 @@ async function startGame(numberOfNodes) {
         nodeHandler.removeElements()
     }
     nodeHandler = new NodeHandler(numberOfNodes)
-    this.input.style.display = "none"
+    input.style.display = "none"
     button.style.display = "none"
 
-    await sleep(numberOfNodes * 1000)
+    setTimeout(() => {
+        nodeHandler.hideNumbers()
 
-
-    for (let i = 0; i < numberOfNodes-1; i++) {
-        nodeHandler.updatePoses()
-        await sleep(2000)
-    }
-
-    nodeHandler.updatePoses()
-    nodeHandler.hideNumbers()
-    nodeHandler.gameStarted = true; 
+        startUpdatingPoses(numberOfNodes);
+    }, numberOfNodes * 1000);
+    nodeHandler.gameStarted = true
 }
+
+function startUpdatingPoses(maxCount) {
+    let count = 0;
+    const intervalId = setInterval(() => {
+        nodeHandler.updatePoses();
+        count++;
+
+        if (count >= maxCount) {
+            clearInterval(intervalId);  // Stop the interval after maxCount updates
+        }
+    }, 2000);  // 2 seconds delay between updates
+}
+
+// created by gpt
+// prompt: make me a function that takes a x and y position and creates a div with the class box in the dom. 
+function createNodeDivAtPosition(x, y, innerHTML, ordered_number, parentId) {
+    // Create a new div element
+    const box = document.createElement('div');
+
+    box.className = 'box';
+    box.id = `node-${ordered_number}`
+
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+    box.innerHTML = innerHTML
+    box.style.backgroundColor = getRandomColor()
+
+
+    let parent = document.getElementById(parentId)
+    parent.appendChild(box)
+    return box
+}
+
 class Node {
     constructor(ordered_number, nodeHandler, parentId) {
         let innerHTML = `<div> ${ordered_number} </div> `
         this.ordered_number = ordered_number
-        this.domElement = this.createNodeDivAtPosition(0, 0, innerHTML, ordered_number, parentId)
+        this.domElement = createNodeDivAtPosition(0, 0, innerHTML, ordered_number, parentId)
         this.nodeHandler = nodeHandler
 
         let [x, y] = this.getRandomPosInWindow()
@@ -43,30 +78,6 @@ class Node {
             throw Error("No ordered_number included")
         }
     }
-
-    getRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    createNodeDivAtPosition(x, y, innerHTML, ordered_number, parentId) {
-        const box = document.createElement('div');
-        box.className = 'box';
-        box.id = `node-${ordered_number}`;
-        box.style.left = `${x}px`;
-        box.style.top = `${y}px`;
-        box.innerHTML = innerHTML;
-        box.style.backgroundColor = this.getRandomColor();
-
-        let parent = document.getElementById(parentId);
-        parent.appendChild(box);
-        return box;
-    }
-
     setPos() {
         this.domElement.style.position = "absolute"
         this.domElement.style.left = this.x + "px"
@@ -84,17 +95,6 @@ class Node {
     showNumber() {
         this.domElement.innerHTML = `${this.ordered_number}`
     }
-    getRandomPosInWindow() {
-        let elementHeight = this.domElement.offsetHeight;
-        let elementWidth = this.domElement.offsetWidth;
-
-        // Calculate valid ranges for x and y to avoid out-of-bounds
-        let x = Math.floor(Math.random() * (window.innerWidth - elementWidth));
-        let y = Math.floor(Math.random() * (window.innerHeight - elementHeight));
-
-        return [x, y];
-    }
-
     getRandomPosInWindow() {
         let elementHeight = this.domElement.offsetHeight;
         let elementWidth = this.domElement.offsetWidth;
@@ -174,70 +174,28 @@ class NodeHandler {
 }
 
 
-class Game {
-    constructor() {
-        this.nodeHandler = null;
-        this.input = null;
-        this.button = null;
-        this.menuDiv = null;
-    }
 
+// Create input and button elements
+const input = document.createElement('input');
+const button = document.createElement('button');
 
-    async  startGame(numberOfNodes) {
-        if (numberOfNodes > 7) {
-            alert(strings.gt7)
-            return
-        }
-        if (this.nodeHandler) {
-            this.nodeHandler.removeElements()
-        }
-        this.nodeHandler = new NodeHandler(numberOfNodes)
-        this.input.style.display = "none"
-        this.button.style.display = "none"
+// Set attributes and text for the button
+input.type = 'number';
+input.placeholder = strings.typeSomethingHere;
+button.textContent = strings.go;
 
-        await sleep(numberOfNodes * 1000)
+// Append elements to the div with id 'menu'
+const menuDiv = document.getElementById('menu');
 
+menuDiv.appendChild(input);
+menuDiv.appendChild(button);
 
-        for (let i = 0; i < numberOfNodes-1; i++) {
-            this.nodeHandler.updatePoses()
-            await sleep(2000)
-        }
-
-        this.nodeHandler.updatePoses()
-        this.nodeHandler.hideNumbers()
-        this.nodeHandler.gameStarted = true; 
-    }
-    startUpdatingPoses(maxCount) {
-        let count = 0;
-        const intervalId = setInterval(() => {
-            this.nodeHandler.updatePoses();
-            count++;
-
-            if (count >= maxCount) {
-                clearInterval(intervalId);
-            }
-        }, 2000);
-    }
-
-    handleButtonClick() {
-        this.startGame(parseInt(this.input.value));
-    }
-
-    main() {
-        this.input = document.createElement('input');
-        this.button = document.createElement('button');
-
-        this.input.type = 'number';
-        this.input.placeholder = strings.typeSomethingHere;
-        this.button.textContent = strings.go;
-
-        this.menuDiv = document.getElementById('menu');
-        this.menuDiv.appendChild(this.input);
-        this.menuDiv.appendChild(this.button);
-
-        this.button.addEventListener('click', () => this.handleButtonClick());
-    }
+// Function to handle button click
+function handleButtonClick() {
+    startGame(parseInt(input.value))
+    nodeHandler.gameStarted = true
 }
 
-const game = new Game();
-game.main();
+
+// Add event listeners
+button.addEventListener('click', handleButtonClick);
